@@ -8,6 +8,8 @@ urlpatterns = [
     path(route='static',view=views.get_static,name='get_static'),
     path(route='about', view=views.get_about, name='get_about'),
     path(route='contact', view=views.get_contact_us, name='get_contact_us'),
+    path(route='login', view=views.login_request, name='login'),
+    path(route='registration', view=views.registration, name='registration'),
     # route is a string contains a URL pattern
     # view refers to the view function
     # name the URL
