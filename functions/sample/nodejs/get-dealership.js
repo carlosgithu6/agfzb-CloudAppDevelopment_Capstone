@@ -22,10 +22,7 @@ let db;
     db = await dbCloudantConnect("dealerships");
 })();
 
-
-
 app.use(express.json());
-
 
 // Define a route to get all dealerships with optional state and ID filters
 app.get('/api/dealerships/get', (req, res) => {
@@ -100,8 +97,6 @@ app.post("/review", function (request, response) {
           response.status(200).json({ msg: 'Review posted!' });
     })
 });
-
-
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
