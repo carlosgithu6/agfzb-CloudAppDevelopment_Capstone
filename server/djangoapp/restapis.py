@@ -57,7 +57,7 @@ def get_request(url, **kwargs):
 def get_dealers_from_cf(url, **kwargs):
     results = []
     # Call get_request with a URL parameter
-    json_result = get_request(url,kwargs)
+    json_result = get_request(url)
     if json_result:
         # Get the row list in JSON as dealers
         dealers = json_result#["rows"]
@@ -74,9 +74,9 @@ def get_dealers_from_cf(url, **kwargs):
 
     return results
 
-def get_dealer_reviews_from_cf(url, dealerId):
+def get_dealer_reviews_from_cf(url, dealer_id):
     results = []
-    json_result = get_request(url,dealerId=dealerId)
+    json_result = get_request(url, dealerId=dealer_id)
     if json_result:
         # Get the row list in JSON as dealers
         print (json_result)

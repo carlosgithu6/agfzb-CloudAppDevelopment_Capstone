@@ -173,3 +173,56 @@ function main(params) {
       }
     }
     )}
+
+
+ ///REVIEWS//
+    function main(params) {
+        console.log(params);
+        return new Promise(function (resolve, reject) {
+            const { CloudantV1 } = require('@ibm-cloud/cloudant');
+            const { IamAuthenticator } = require('ibm-cloud-sdk-core');
+            const authenticator = new IamAuthenticator({ apikey: "06ai-P7sXy6ktpM90glcn2q8IleSHKTaZ7x1whp7TQP4" })
+            const cloudant = CloudantV1.newInstance({
+                authenticator: authenticator
+            });
+            cloudant.setServiceUrl("https://apikey-v2-1idq9ptiz6fqglizwpenj74deckaon8rb07ljcc4y29r:65356efd3cc57ded83d59bf9c98f8dcb@448de67d-c72d-4a8f-971b-30303d11b3b7-bluemix.cloudantnosqldb.appdomain.cloud");
+            if (params.dealerId) {
+               
+                cloudant.postFind({
+                                   db:'reviews',
+                                   selector:{dealership:parseInt(params.dealerId)}
+                                  })
+                .then((result)=>{
+                 
+                  let code = 200;
+                  if (result.result.docs.length == 0) {
+                      code = 404;
+                  }
+                  resolve({
+                      statusCode: code,
+                      headers: { 'Content-Type': 'application/json' },
+                      body:result.result.docs
+                  });
+                }).catch((err)=>{
+                  reject(err);
+                })
+            }  else {
+                // return all documents 
+                cloudant.postAllDocs({ db: 'reviews', includeDocs: true, limit: 100 })            
+                .then((result)=>{
+                  // console.log(result.result.rows);
+                  let code = 200;
+                  if (result.result.rows.length == 0) {
+                      code = 404;
+                  }
+                  resolve({
+                      statusCode: code,
+                      headers: { 'Content-Type': 'application/json' },
+                      body: result.result.rows
+                  });
+                }).catch((err)=>{
+                  reject(err);
+                })
+          }
+        }
+        )}
