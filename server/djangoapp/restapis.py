@@ -36,6 +36,28 @@ import requests
 import json
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
+from ibm_watson import NaturalLanguageUnderstandingV1
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_watson.natural_language_understanding_v1 \
+    import Features, SentimentOptions,EntitiesOptions, KeywordsOptions
+ulr_NLU = "https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/629f860d-192a-41c5-b953-57d1d60c4f6b"
+api_key_NLU = "QOhKCsOu5jYSuiXEWe6rrH2MBweeHHM_TuVkjhGxg3yh"
+def get_request_watson(url, data):
+    print(data)
+    print("GET from {} ".format(url))
+    try:
+        # Call get method of requests library with URL and parameters
+       api_key = "QOhKCsOu5jYSuiXEWe6rrH2MBweeHHM_TuVkjhGxg3yh"
+       response = requests.get(url, params=data,
+                                headers={'Content-Type': 'application/json','Authorization':f'Bearer {api_key}'},
+                              )
+    except:
+        # If any error occurs
+        print("Network exception occurred")
+    status_code = response.status_code
+    print("With status {} ".format(status_code))
+    json_data = json.loads(response.text)
+    return json_data
 
 def get_request(url, **kwargs):
     print(kwargs)
@@ -74,12 +96,22 @@ def get_dealers_from_cf(url, **kwargs):
 
     return results
 
+def analyze_review_sentiments(dealerreview):
+    authenticator = IAMAuthenticator(api_key_NLU)
+   
+    natural_language_understanding = NaturalLanguageUnderstandingV1(version='2022-04-07', authenticator=authenticator )
+    natural_language_understanding.set_service_url(ulr_NLU)
+    response = natural_language_understanding.analyze(
+    text=dealerreview,
+    features=Features(entities=EntitiesOptions(emotion=True, sentiment=True, limit=2), keywords=KeywordsOptions(emotion=True, sentiment=True, limit=2))).get_result()
+    return json.dumps(response, indent=2)
+
+
 def get_dealer_reviews_from_cf(url, dealer_id):
     results = []
     json_result = get_request(url, dealerId=dealer_id)
     if json_result:
         # Get the row list in JSON as dealers
-        print (json_result)
         reviews = json_result
         # For each dealer object
         for review in reviews:
@@ -89,8 +121,14 @@ def get_dealer_reviews_from_cf(url, dealer_id):
             reviews_obj = DealerReview(dealership=review["dealership"], name=review["name"], purchase=review["purchase"],
                                    review=review["review"], purchase_date=review["purchase_date"], car_make=review["car_make"],
                                    car_model=review["car_model"], car_year=review["car_year"],
-                                   sentiment="",id=review["_id"])
+                                   sentiment=analyze_review_sentiments(review["review"]),id=review["_id"])
             
             results.append(reviews_obj)
 
     return results
+
+
+
+    
+   
+    
