@@ -127,8 +127,52 @@ def get_dealer_reviews_from_cf(url, dealer_id):
 
     return results
 
+'''
+{
 
+"review": 
+
+    {
+
+        "id": 1114,
+
+        "name": "Upkar Lidder",
+
+        "dealership": 15,
+
+        "review": "Great service!",
+
+        "purchase": false,
+
+        "another": "field",
+
+        "purchase_date": "02/16/2021",
+
+        "car_make": "Audi",
+
+        "car_model": "Car",
+
+        "car_year": 2021
+
+    }
+
+}
+'''
+def post_request(url, json_payload):
+        
+    try:
+        api_key = "ApiKey-b8714c0c-7627-4e3b-b4a5-0ae93eXXXXXX"
+        headers = {
+           'Content-Type': 'application/json'           
+        }
+        response = requests.post(url, headers=headers, params=json_payload)
+        status_code = response.status_code
+        json_resp = json.load(response.text)
+        print(response.text)
+        return json_resp
+    except:
+         return{'message':'Something went wrong'}
 
     
    
-    
+     
