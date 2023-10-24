@@ -1,37 +1,3 @@
-#import requests
-#import json
-# import related models here
-#from requests.auth import HTTPBasicAuth
-
-
-# Create a `get_request` to make HTTP GET requests
-# e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
-#                                     auth=HTTPBasicAuth('apikey', api_key))
-
-
-# Create a `post_request` to make HTTP POST requests
-# e.g., response = requests.post(url, params=kwargs, json=payload)
-
-
-# Create a get_dealers_from_cf method to get dealers from a cloud function
-# def get_dealers_from_cf(url, **kwargs):
-# - Call get_request() with specified arguments
-# - Parse JSON results into a CarDealer object list
-
-
-# Create a get_dealer_reviews_from_cf method to get reviews by dealer id from a cloud function
-# def get_dealer_by_id_from_cf(url, dealerId):
-# - Call get_request() with specified arguments
-# - Parse JSON results into a DealerView object list
-
-
-# Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
-# def analyze_review_sentiments(text):
-# - Call get_request() with specified arguments
-# - Get the returned sentiment label such as Positive or Negative
-
-
-
 import requests
 import json
 from .models import CarDealer, DealerReview
@@ -118,46 +84,17 @@ def get_dealer_reviews_from_cf(url, dealer_id):
             # Get its content in `doc` object
           
             # Create a CarDealer object with values in `doc` object
-            reviews_obj = DealerReview(dealership=review["dealership"], name=review["name"], purchase=review["purchase"],
+            review_obj = DealerReview(dealership=review["dealership"], name=review["name"], purchase=review["purchase"],
                                    review=review["review"], purchase_date=review["purchase_date"], car_make=review["car_make"],
                                    car_model=review["car_model"], car_year=review["car_year"],
                                    sentiment=analyze_review_sentiments(review["review"]),id=review["_id"])
-            
-            results.append(reviews_obj)
+            senti =json.loads(review_obj.sentiment)["keywords"][0]["sentiment"]['label']
+            review_obj.sentiment=senti
+            results.append(review_obj)
 
     return results
 
-'''
-{
 
-"review": 
-
-    {
-
-        "id": 1114,
-
-        "name": "Upkar Lidder",
-
-        "dealership": 15,
-
-        "review": "Great service!",
-
-        "purchase": false,
-
-        "another": "field",
-
-        "purchase_date": "02/16/2021",
-
-        "car_make": "Audi",
-
-        "car_model": "Car",
-
-        "car_year": 2021
-
-    }
-
-}
-'''
 def post_request(url, json_payload):
         
     try:
