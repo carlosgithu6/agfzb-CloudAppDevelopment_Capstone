@@ -42,7 +42,7 @@ def get_request(url, **kwargs):
     return json_data
 
 
-def get_dealers_from_cf(url, **kwargs):
+def get_dealers_from_cf(url):
     results = []
     # Call get_request with a URL parameter
     json_result = get_request(url)
@@ -61,6 +61,13 @@ def get_dealers_from_cf(url, **kwargs):
             results.append(dealer_obj)
 
     return results
+def get_dealer_by_id_from_cf(url, id):
+    
+    dealers = get_dealers_from_cf(url)
+    dealer = [x for x in dealers if x.id == id]
+    print (dealer)
+    return dealer[0]
+
 
 def analyze_review_sentiments(dealerreview):
     authenticator = IAMAuthenticator(api_key_NLU)
@@ -88,13 +95,16 @@ def get_dealer_reviews_from_cf(url, dealer_id):
                                    review=review["review"], purchase_date=review["purchase_date"], car_make=review["car_make"],
                                    car_model=review["car_model"], car_year=review["car_year"],
                                    sentiment=analyze_review_sentiments(review["review"]),id=review["_id"])
-            senti =json.loads(review_obj.sentiment)["keywords"][0]["sentiment"]['label']
+            if len(json.loads(review_obj.sentiment)["keywords"]) > 0 :
+                senti =json.loads(review_obj.sentiment)["keywords"][0]["sentiment"]['label']
+            else:
+                senti = 'neutral'
             review_obj.sentiment=senti
             results.append(review_obj)
 
     return results
 
-
+'''
 def post_request(url, json_payload):
         
     try:
@@ -109,7 +119,13 @@ def post_request(url, json_payload):
         return json_resp
     except:
          return{'message':'Something went wrong'}
-
+'''
     
+def post_request(url, json_payload, **kwargs):
+    #url =  "https://ritikaj-5000.theiadocker-3-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/post_review"
    
+    
+    response = requests.post(url, params=kwargs, json=json_payload)
+    print (response.text)
+    return response
      

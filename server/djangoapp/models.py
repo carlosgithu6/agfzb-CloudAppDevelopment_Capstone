@@ -48,10 +48,14 @@ class CarModel(models.Model):
     Year = models.DateField(default=now)
     Color = models.CharField(max_length=10)
     def __str__(self):
+        '''
         return "Make: " + self.Make.Name +'\n'+ \
                 "Dealer Id: " + str(self.DealerId) +\
                 "Year: "+ str(self.Year.year)+\
                 "Type: "+ self.Type
+        '''
+        return self.Type+'-'+self.Make.Name +'-'+str(self.Year.year)
+               
 
 
 
